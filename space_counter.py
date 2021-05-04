@@ -19,13 +19,22 @@ class SpaceRecorder(QtWidgets.QWidget):
     minRectWidth = 40
     maxRectWidth = 200
     rectAppeared = False
+    isActive = True
+    hasStarted = False
 
     def __init__(self, isDarkmode):
         super().__init__()
         self.isDarkmode = isDarkmode
-        self.counter = 0
         self.initUI()
-        self.color = self.white
+        self.timer = QtCore.QTimer()
+        self.counter = 0
+        self.timerStarted = False
+        #self.color = self.white
+
+    def showRect(self):
+        print("timer")
+        self.update()
+        self.timerStarted = False
 
     def initUI(self):
         # set the text property of the widget we are inheriting
@@ -42,44 +51,73 @@ class SpaceRecorder(QtWidgets.QWidget):
 
     def keyPressEvent(self, ev):
         if ev.key() == QtCore.Qt.Key_Space:
-            if self.rectAppeared:
-                self.counter += 1
-                self.rectAppeared = False
-                self.update()
+            if self.timerStarted:
+                #self.update()
+                print("self.timerstartet is true")
+            else: 
+                self.__showRectOrText()
+
+    def start(self, event):
+        print("event start")
+        print(self.timer.isActive())
+        self.update()
+
 
     def paintEvent(self, event):
-        qp = QtGui.QPainter()
-        qp.begin(self)
-        self.drawText(event, qp)
-        self.drawRect(event, qp)
-        qp.end()
+        if not self.timerStarted:
+            if not self.rectAppeared:
+                qp = QtGui.QPainter()
+                qp.begin(self)
+                self.drawRect(event, qp)
+                qp.end()
+            else:
+                qp = QtGui.QPainter()
+                qp.begin(self)
+                self.drawText(event, qp)
+                qp.end()
+        else:
+            print("blackscreen")
 
     def drawText(self, event, qp):
+        print("draw text")
+        self.rectAppeared = False
         if self.isDarkmode:
             qp.setPen(self.white)
         else:
             qp.setPen(self.black)
         qp.setFont(QtGui.QFont('Decorative', 32))
         if self.counter > 0:
-            self.text = str(self.counter)
-        qp.drawText(event.rect(), QtCore.Qt.AlignBottom, self.text)
+            self.text = f'Press "Space" to start (Round {str(self.counter)})'
+        qp.drawText(event.rect(), QtCore.Qt.AlignCenter, self.text)
 
     def drawRect(self, event, qp):
-        qp.setBrush(self.black)
-        qp.drawRect(QtCore.QRect(10, 10, 10, 10))
+        print("draw rect")
         rect = self.__getRandomRect()
         if self.isDarkmode:
             qp.setBrush(self.white)
         else:
             qp.setBrush(self.black)
-        self.rectAppeared = True
         qp.drawRect(rect)
+        self.rectAppeared = True
 
     def __getRandomRect(self):
         xPos = random.randint(0, self.width - self.maxRectWidth)
         yPos = random.randint(0, self.height - self.maxRectWidth)
         height = random.randint(self.minRectWidth, self.maxRectWidth)
         return QtCore.QRect(xPos, yPos, height, height)
+
+    def __showRectOrText(self):
+        if not self.rectAppeared:
+            print("start timer")
+            self.timerStarted = True
+            self.update()
+            self.timer.singleShot(random.randint(2,5)*1000, lambda: self.showRect())
+        else:
+            # catch reation time here
+            self.counter += 1
+            print("space pressed to catch reaction")
+            self.update()
+
 
 
 def main():

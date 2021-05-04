@@ -11,10 +11,7 @@ from datetime import datetime
 FIELDS = ["id", "condition", "mode", "run", "pressed_key", "pressed_correct_key", "reaction_time_sec", "time_stamp"]
 
 class SpaceRecorder(QtWidgets.QWidget):
-    """ Counts how often the 'space' key is pressed and displays the count.
-        print(reactionTime)
-    Every time the 'space' key is pressed, a visual indicator is toggled, too.
-    """
+    
     def __init__(self, isDarkmode, id):
         super().__init__()
         self.id = id
@@ -32,7 +29,6 @@ class SpaceRecorder(QtWidgets.QWidget):
         self.timerStarted = False
         self.color = self.white if self.isDarkmode else self.black
         self.df = pd.DataFrame(columns=FIELDS)
-        self.circleAppeared = False
 
     def showRect(self):
         self.update()
@@ -41,7 +37,7 @@ class SpaceRecorder(QtWidgets.QWidget):
     def initUI(self):
         # set the text property of the widget we are inheriting
         self.setGeometry(100, 100, self.width, self.height)
-        self.setWindowTitle('Darkmode vs Lightmode')
+        self.setWindowTitle('Darkmode vs Lightmode Test 1')
         # widget should accept focus by click and tab key
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.__setBackgroundColor()
@@ -101,7 +97,7 @@ class SpaceRecorder(QtWidgets.QWidget):
             self.timerStarted = True
             self.update()
             self.timer.singleShot(random.randint(
-                1, 2)*1000, lambda: self.showRect())
+                1, 6)*1000, lambda: self.showRect())
         else:
             # catch reation time here
             self.__addRow()
@@ -126,6 +122,7 @@ class SpaceRecorder(QtWidgets.QWidget):
     def __addRow(self):
         condition = "dark" if self.isDarkmode else "light"
         reactionTime = time.time() - self.startTime
+        print(reactionTime)
         timeStamp = datetime.now()
         run = self.round if self.round <= 10 else self.round-10
         d = {

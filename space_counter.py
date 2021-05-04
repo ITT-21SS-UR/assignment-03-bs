@@ -32,9 +32,9 @@ class SpaceRecorder(QtWidgets.QWidget):
         self.timerStarted = False
         self.color = self.white if self.isDarkmode else self.black
         self.df = pd.DataFrame(columns=FIELDS)
+        self.circleAppeared = False
 
     def showRect(self):
-        print("timer started")
         self.update()
         self.timerStarted = False
 
@@ -49,28 +49,27 @@ class SpaceRecorder(QtWidgets.QWidget):
 
     def keyPressEvent(self, ev):
         if ev.key() == QtCore.Qt.Key_Space:
-            if self.round <= 4:
+            if self.round <= 20:
                 if not self.timerStarted:
-                    self.__showRectOrText()
+                    self.__modeOne()
 
     def paintEvent(self, event):
         if not self.timerStarted:
             self.__paintRectOrText(event)
 
+
     def drawText(self, event, qp):
-        print("draw text")
         self.rectAppeared = False
         qp.setPen(self.color)
         qp.setFont(QtGui.QFont('Decorative', 32))
         if self.round > 0:
             self.text = f'Press "Space" to start round {str(self.round)}'
-        if self.round == 5:
-            self.text = "You finished the first test. \nNow it gets more difficult \npress 'space' only if a RECTANGLE appears! \n(Press 'space' to start)"
+        if self.round == 21:
+            self.text = "You have finished the first test. \nThank you!"
             self.df = self.df.to_csv(f'/home/erik/assignments/assignment-03-bs/user{self.id}.csv', index=False)
         qp.drawText(event.rect(), QtCore.Qt.AlignCenter, self.text)
 
     def drawRect(self, event, qp):
-        print("draw rect")
         rect = self.__getRandomRect()
         qp.setBrush(self.color)
         qp.drawRect(rect)
@@ -82,7 +81,7 @@ class SpaceRecorder(QtWidgets.QWidget):
         return QtCore.QRect(xPos, yPos, height, height)
 
     def __setColorScheme(self):
-        if self.round == 2:
+        if self.round == 10:
             self.__changeColorTheme()
         
     def __changeColorTheme(self):
@@ -97,13 +96,12 @@ class SpaceRecorder(QtWidgets.QWidget):
             self.setStyleSheet('background-color: white')
 
 
-    def __showRectOrText(self):
+    def __modeOne(self):
         if not self.rectAppeared:
-            print("start timer")
             self.timerStarted = True
             self.update()
             self.timer.singleShot(random.randint(
-                1, 6)*1000, lambda: self.showRect())
+                2, 6)*1000, lambda: self.showRect())
         else:
             # catch reation time here
             self.__addRow()
@@ -128,15 +126,13 @@ class SpaceRecorder(QtWidgets.QWidget):
     def __addRow(self):
         FIELDS = ["id", "condition", "mode", "pressed_key", "pressed_correct_key", "reaction_time_sec", "time_stamp"]
         condition = "dark" if self.isDarkmode else "light"
-        mode = 1 if self.round <= 20 else 2
         reactionTime = time.time() - self.startTime
         timeStamp = datetime.now()
-        print(reactionTime)
 
         d = {
             'id': self.id,
             'condition': condition,
-            'mode': mode,
+            'mode': 1,
             'pressed_key': 'space',
             'pressed_correct_key': True,
             'reaction_time_sec': reactionTime,

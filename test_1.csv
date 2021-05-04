@@ -1,0 +1,3 @@
+id,condition,mode,run,key_pressed,correct_key_pressed,reaction_time_in_sec,timestamp
+1,1,dark,1,space,true,2,1545730073
+1,1,light,2,space,true,2.4,1545730074

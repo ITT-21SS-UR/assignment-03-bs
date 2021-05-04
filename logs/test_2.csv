@@ -1,3 +1,0 @@
-id,condition,mode,key_pressed,correct_key_pressed,react_time_in_sec,timestamp
-1,1,dark,space,true,0.1,1545730084
-1,1,dark,space,false,1.4,1545730089

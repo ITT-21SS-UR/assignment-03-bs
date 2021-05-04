@@ -1,0 +1,5 @@
+id,condition,mode,pressed_key,pressed_correct_key,reaction_time_sec,time_stamp
+1,dark,1,space,True,0.8662910461425781,2021-05-04 16:41:15.377224
+1,dark,1,space,True,0.5957057476043701,2021-05-04 16:41:21.026616
+1,light,1,space,True,0.49213385581970215,2021-05-04 16:41:25.921602
+1,light,1,space,True,0.5970609188079834,2021-05-04 16:41:29.393500

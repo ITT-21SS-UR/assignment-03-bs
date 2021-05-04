@@ -5,15 +5,19 @@ import sys
 from PyQt5 import QtGui, QtWidgets, QtCore
 import random
 import time
+import pandas as pd
+from datetime import datetime
 
+FIELDS = ["id", "condition", "mode", "pressed_key", "pressed_correct_key", "reaction_time_sec", "time_stamp"]
 
 class SpaceRecorder(QtWidgets.QWidget):
     """ Counts how often the 'space' key is pressed and displays the count.
 
     Every time the 'space' key is pressed, a visual indicator is toggled, too.
     """
-    def __init__(self, isDarkmode):
+    def __init__(self, isDarkmode, id):
         super().__init__()
+        self.id = id
         self.black = QtGui.QColor(0, 0, 0)
         self.white = QtGui.QColor(255, 255, 255)
         self.width = 1200
@@ -27,6 +31,7 @@ class SpaceRecorder(QtWidgets.QWidget):
         self.round = 1
         self.timerStarted = False
         self.color = self.white if self.isDarkmode else self.black
+        self.df = pd.DataFrame(columns=FIELDS)
 
     def showRect(self):
         print("timer started")
@@ -59,8 +64,9 @@ class SpaceRecorder(QtWidgets.QWidget):
         qp.setFont(QtGui.QFont('Decorative', 32))
         if self.round > 0:
             self.text = f'Press "Space" to start round {str(self.round)}'
-        if self.round == 4:
-            self.text = "You finished the first test. Now press space only if a RECTANGLE appears"
+        if self.round == 5:
+            self.text = "You finished the first test. \nNow it gets more difficult \npress 'space' only if a RECTANGLE appears! \n(Press 'space' to start)"
+            self.df = self.df.to_csv(f'/home/erik/assignments/assignment-03-bs/user{self.id}.csv', index=False)
         qp.drawText(event.rect(), QtCore.Qt.AlignCenter, self.text)
 
     def drawRect(self, event, qp):
@@ -100,8 +106,7 @@ class SpaceRecorder(QtWidgets.QWidget):
                 1, 6)*1000, lambda: self.showRect())
         else:
             # catch reation time here
-            reactionTime = time.time() - self.startTime
-            print(reactionTime)
+            self.__addRow()
             self.__setColorScheme()
             self.round += 1
             self.update()
@@ -120,6 +125,25 @@ class SpaceRecorder(QtWidgets.QWidget):
             self.drawText(event, qp)
             qp.end()
 
+    def __addRow(self):
+        FIELDS = ["id", "condition", "mode", "pressed_key", "pressed_correct_key", "reaction_time_sec", "time_stamp"]
+        condition = "dark" if self.isDarkmode else "light"
+        mode = 1 if self.round <= 20 else 2
+        reactionTime = time.time() - self.startTime
+        timeStamp = datetime.now()
+        print(reactionTime)
+
+        d = {
+            'id': self.id,
+            'condition': condition,
+            'mode': mode,
+            'pressed_key': 'space',
+            'pressed_correct_key': True,
+            'reaction_time_sec': reactionTime,
+            'time_stamp': timeStamp
+        }
+        self.df = self.df.append(d, ignore_index=True)
+
 
 def main():
     isDarkmode = False
@@ -135,7 +159,7 @@ def main():
         sys.exit()
     app = QtWidgets.QApplication(sys.argv)
     # variable is never used, class automatically registers itself for Qt main loop:
-    space = SpaceRecorder(isDarkmode)
+    space = SpaceRecorder(isDarkmode, 1)
     sys.exit(app.exec_())
 
 

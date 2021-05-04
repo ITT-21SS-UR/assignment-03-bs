@@ -122,7 +122,6 @@ class SpaceRecorder(QtWidgets.QWidget):
     def __addRow(self):
         condition = "dark" if self.isDarkmode else "light"
         reactionTime = time.time() - self.startTime
-        print(reactionTime)
         timeStamp = datetime.now()
         run = self.round if self.round <= 10 else self.round-10
         d = {
@@ -135,6 +134,7 @@ class SpaceRecorder(QtWidgets.QWidget):
             'reaction_time_sec': reactionTime,
             'time_stamp': timeStamp
         }
+        print(d)
         self.df = self.df.append(d, ignore_index=True)
 
 def main():

@@ -12,7 +12,7 @@ FIELDS = ["id", "condition", "mode", "pressed_key", "pressed_correct_key", "reac
 
 class SpaceRecorder(QtWidgets.QWidget):
     """ Counts how often the 'space' key is pressed and displays the count.
-
+        print(reactionTime)
     Every time the 'space' key is pressed, a visual indicator is toggled, too.
     """
     def __init__(self, isDarkmode, id):

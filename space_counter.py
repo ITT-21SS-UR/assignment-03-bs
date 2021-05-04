@@ -12,93 +12,62 @@ class SpaceRecorder(QtWidgets.QWidget):
 
     Every time the 'space' key is pressed, a visual indicator is toggled, too.
     """
-    black = QtGui.QColor(0, 0, 0)
-    white = QtGui.QColor(255, 255, 255)
-    width = 1200
-    height = 800
-    minRectWidth = 40
-    maxRectWidth = 200
-    rectAppeared = False
-    isActive = True
-    hasStarted = False
-
     def __init__(self, isDarkmode):
         super().__init__()
+        self.black = QtGui.QColor(0, 0, 0)
+        self.white = QtGui.QColor(255, 255, 255)
+        self.width = 1200
+        self.height = 800
+        self.minRectWidth = 40
+        self.maxRectWidth = 200
+        self.rectAppeared = False
         self.isDarkmode = isDarkmode
         self.initUI()
         self.timer = QtCore.QTimer()
-        self.counter = 0
+        self.round = 1
         self.timerStarted = False
-        #self.color = self.white
+        self.color = self.white if self.isDarkmode else self.black
 
     def showRect(self):
-        print("timer")
+        print("timer started")
         self.update()
         self.timerStarted = False
 
     def initUI(self):
         # set the text property of the widget we are inheriting
-        self.text = "Please press 'space' if a new rectangle appears"
         self.setGeometry(100, 100, self.width, self.height)
-        self.setWindowTitle('ClickRecorder')
+        self.setWindowTitle('Darkmode vs Lightmode')
         # widget should accept focus by click and tab key
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
-        if self.isDarkmode:
-            self.setStyleSheet('background-color: black')
-        else:
-            self.setStyleSheet('background-color: white')
+        self.__setBackgroundColor()
         self.show()
 
     def keyPressEvent(self, ev):
         if ev.key() == QtCore.Qt.Key_Space:
-            if self.timerStarted:
-                #self.update()
-                print("self.timerstartet is true")
-            else: 
-                self.__showRectOrText()
-
-    def start(self, event):
-        print("event start")
-        print(self.timer.isActive())
-        self.update()
-
+            if self.round <= 4:
+                if not self.timerStarted:
+                    self.__showRectOrText()
 
     def paintEvent(self, event):
         if not self.timerStarted:
-            if not self.rectAppeared:
-                qp = QtGui.QPainter()
-                qp.begin(self)
-                self.drawRect(event, qp)
-                qp.end()
-            else:
-                qp = QtGui.QPainter()
-                qp.begin(self)
-                self.drawText(event, qp)
-                qp.end()
-        else:
-            print("blackscreen")
+            self.__paintRectOrText(event)
 
     def drawText(self, event, qp):
         print("draw text")
         self.rectAppeared = False
-        if self.isDarkmode:
-            qp.setPen(self.white)
-        else:
-            qp.setPen(self.black)
+        qp.setPen(self.color)
         qp.setFont(QtGui.QFont('Decorative', 32))
-        if self.counter > 0:
-            self.text = f'Press "Space" to start (Round {str(self.counter)})'
+        if self.round > 0:
+            self.text = f'Press "Space" to start round {str(self.round)}'
+        if self.round == 4:
+            self.text = "You finished the first test. Now press space only if a RECTANGLE appears"
         qp.drawText(event.rect(), QtCore.Qt.AlignCenter, self.text)
 
     def drawRect(self, event, qp):
         print("draw rect")
         rect = self.__getRandomRect()
-        if self.isDarkmode:
-            qp.setBrush(self.white)
-        else:
-            qp.setBrush(self.black)
+        qp.setBrush(self.color)
         qp.drawRect(rect)
-        self.rectAppeared = True
 
     def __getRandomRect(self):
         xPos = random.randint(0, self.width - self.maxRectWidth)
@@ -106,18 +75,50 @@ class SpaceRecorder(QtWidgets.QWidget):
         height = random.randint(self.minRectWidth, self.maxRectWidth)
         return QtCore.QRect(xPos, yPos, height, height)
 
+    def __setColorScheme(self):
+        if self.round == 2:
+            self.__changeColorTheme()
+        
+    def __changeColorTheme(self):
+        self.isDarkmode = not self.isDarkmode
+        self.color = self.white if self.isDarkmode else self.black
+        self.__setBackgroundColor()
+
+    def __setBackgroundColor(self):
+        if self.isDarkmode:
+            self.setStyleSheet('background-color: black')
+        else:
+            self.setStyleSheet('background-color: white')
+
+
     def __showRectOrText(self):
         if not self.rectAppeared:
             print("start timer")
             self.timerStarted = True
             self.update()
-            self.timer.singleShot(random.randint(2,5)*1000, lambda: self.showRect())
+            self.timer.singleShot(random.randint(
+                1, 6)*1000, lambda: self.showRect())
         else:
             # catch reation time here
-            self.counter += 1
-            print("space pressed to catch reaction")
+            reactionTime = time.time() - self.startTime
+            print(reactionTime)
+            self.__setColorScheme()
+            self.round += 1
             self.update()
 
+    def __paintRectOrText(self, event):
+        if not self.rectAppeared:
+            qp = QtGui.QPainter()
+            qp.begin(self)
+            self.drawRect(event, qp)
+            qp.end()
+            self.rectAppeared = True
+            self.startTime = time.time()
+        else:
+            qp = QtGui.QPainter()
+            qp.begin(self)
+            self.drawText(event, qp)
+            qp.end()
 
 
 def main():

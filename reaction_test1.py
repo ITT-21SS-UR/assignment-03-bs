@@ -128,7 +128,6 @@ class SpaceRecorder(QtWidgets.QWidget):
         condition = "dark" if self.isDarkmode else "light"
         reactionTime = time.time() - self.startTime
         timeStamp = datetime.now()
-
         d = {
             'id': self.id,
             'condition': condition,
@@ -143,7 +142,7 @@ class SpaceRecorder(QtWidgets.QWidget):
 
 def main():
     isDarkmode = False
-    if len(sys.argv) == 2:
+    if len(sys.argv) == 3:
         if sys.argv[1] in ('True', 'False'):
             if sys.argv[1] == 'True':
                 isDarkmode = True
@@ -151,11 +150,11 @@ def main():
             print("Argument has to be 'True' or 'False'")
             sys.exit()
     else:
-        print("Set second argument to 'True' to start with dark mode or 'False' to start with light mode")
+        print("Set second argument to 'True' to start with dark mode or 'False' to start with light mode and third argument should be the participantID")
         sys.exit()
     app = QtWidgets.QApplication(sys.argv)
     # variable is never used, class automatically registers itself for Qt main loop:
-    space = SpaceRecorder(isDarkmode, 1)
+    space = SpaceRecorder(isDarkmode, sys.argv[2])
     sys.exit(app.exec_())
 
 

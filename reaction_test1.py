@@ -8,7 +8,7 @@ import time
 import pandas as pd
 from datetime import datetime
 
-FIELDS = ["id", "condition", "mode", "pressed_key", "pressed_correct_key", "reaction_time_sec", "time_stamp"]
+FIELDS = ["id", "condition", "mode", "run", "pressed_key", "pressed_correct_key", "reaction_time_sec", "time_stamp"]
 
 class SpaceRecorder(QtWidgets.QWidget):
     """ Counts how often the 'space' key is pressed and displays the count.
@@ -101,7 +101,7 @@ class SpaceRecorder(QtWidgets.QWidget):
             self.timerStarted = True
             self.update()
             self.timer.singleShot(random.randint(
-                2, 6)*1000, lambda: self.showRect())
+                1, 2)*1000, lambda: self.showRect())
         else:
             # catch reation time here
             self.__addRow()
@@ -124,21 +124,21 @@ class SpaceRecorder(QtWidgets.QWidget):
             qp.end()
 
     def __addRow(self):
-        FIELDS = ["id", "condition", "mode", "pressed_key", "pressed_correct_key", "reaction_time_sec", "time_stamp"]
         condition = "dark" if self.isDarkmode else "light"
         reactionTime = time.time() - self.startTime
         timeStamp = datetime.now()
+        run = self.round if self.round <= 10 else self.round-10
         d = {
             'id': self.id,
             'condition': condition,
             'mode': 1,
+            'run': run,
             'pressed_key': 'space',
             'pressed_correct_key': True,
             'reaction_time_sec': reactionTime,
             'time_stamp': timeStamp
         }
         self.df = self.df.append(d, ignore_index=True)
-
 
 def main():
     isDarkmode = False

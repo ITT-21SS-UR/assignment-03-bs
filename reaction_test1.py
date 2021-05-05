@@ -8,7 +8,7 @@ import time
 import pandas as pd
 from datetime import datetime
 
-FIELDS = ["id", "condition", "mode", "run", "pressed_key", "pressed_correct_key", "reaction_time_sec", "time_stamp"]
+FIELDS = ["id", "condition", "mode", "run", "pressed_key", "pressed_correct_key", "reaction_time_in_sec", "time_waited_in_sec", "time_stamp"]
 
 class SpaceRecorder(QtWidgets.QWidget):
     
@@ -63,7 +63,7 @@ class SpaceRecorder(QtWidgets.QWidget):
             self.text = f'Press "Space" to start round {str(self.round)}'
         if self.round == 21:
             self.text = "You have finished the first test. \nThank you!"
-            self.df = self.df.to_csv(f'/home/erik/assignments/assignment-03-bs/user{self.id}.csv', index=False)
+            self.df = self.df.to_csv(f'/home/erik/assignments/assignment-03-bs/test1_{self.id}.csv', index=False)
         qp.drawText(event.rect(), QtCore.Qt.AlignCenter, self.text)
 
     def drawRect(self, event, qp):

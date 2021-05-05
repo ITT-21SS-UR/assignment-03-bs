@@ -9,7 +9,7 @@ import pandas as pd
 from datetime import datetime
 
 FIELDS = ["id", "condition", "mode", "run", "pressed_key",
-          "pressed_correct_key", "reaction_time_sec", "time_stamp"]
+          "pressed_correct_key", "reaction_time_in_sec", "time_waited_in_sec", "time_stamp"]
 
 
 class SpaceRecorder(QtWidgets.QWidget):

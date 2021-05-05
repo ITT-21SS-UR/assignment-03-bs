@@ -29,6 +29,7 @@ class SpaceRecorder(QtWidgets.QWidget):
         self.timerStarted = False
         self.color = self.white if self.isDarkmode else self.black
         self.df = pd.DataFrame(columns=FIELDS)
+        self.timeWaited = 0
 
     def showRect(self):
         self.update()
@@ -96,8 +97,9 @@ class SpaceRecorder(QtWidgets.QWidget):
         if not self.rectAppeared:
             self.timerStarted = True
             self.update()
-            self.timer.singleShot(random.randint(
-                1, 6)*1000, lambda: self.showRect())
+            self.timeWaited = random.randint(
+                1, 6)
+            self.timer.singleShot(self.timeWaited*1000, lambda: self.showRect())
         else:
             # catch reation time here
             self.__addRow()
@@ -131,7 +133,8 @@ class SpaceRecorder(QtWidgets.QWidget):
             'run': run,
             'pressed_key': 'space',
             'pressed_correct_key': True,
-            'reaction_time_sec': reactionTime,
+            'reaction_time_in_sec': reactionTime,
+            'time_waited_in_sec': self.timeWaited,
             'time_stamp': timeStamp
         }
         print(d)

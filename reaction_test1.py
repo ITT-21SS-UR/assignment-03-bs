@@ -8,10 +8,15 @@ import time
 import pandas as pd
 from datetime import datetime
 
-FIELDS = ["id", "condition", "mode", "run", "pressed_key", "pressed_correct_key", "reaction_time_in_sec", "time_waited_in_sec", "time_stamp"]
+FIELDS = ["id", "condition", "mode",
+          "run",
+          "pressed_key", "pressed_correct_key",
+          "reaction_time_in_sec", "time_waited_in_sec",
+          "time_stamp"]
+
 
 class SpaceRecorder(QtWidgets.QWidget):
-    
+
     def __init__(self, isDarkmode, id):
         super().__init__()
         self.id = id
@@ -54,7 +59,6 @@ class SpaceRecorder(QtWidgets.QWidget):
         if not self.timerStarted:
             self.__paintRectOrText(event)
 
-
     def drawText(self, event, qp):
         self.rectAppeared = False
         qp.setPen(self.color)
@@ -63,7 +67,9 @@ class SpaceRecorder(QtWidgets.QWidget):
             self.text = f'Press "Space" to start round {str(self.round)}'
         if self.round == 21:
             self.text = "You have finished the first test. \nThank you!"
-            self.df = self.df.to_csv(f'/home/erik/assignments/assignment-03-bs/test1_{self.id}.csv', index=False)
+            self.df = self.df.to_csv(
+                f'/home/erik/assignments/assignment-03-bs/test1_{self.id}.csv',
+                index=False)
         qp.drawText(event.rect(), QtCore.Qt.AlignCenter, self.text)
 
     def drawRect(self, event, qp):
@@ -80,7 +86,7 @@ class SpaceRecorder(QtWidgets.QWidget):
     def __setColorScheme(self):
         if self.round == 10:
             self.__changeColorTheme()
-        
+
     def __changeColorTheme(self):
         self.isDarkmode = not self.isDarkmode
         self.color = self.white if self.isDarkmode else self.black
@@ -92,14 +98,14 @@ class SpaceRecorder(QtWidgets.QWidget):
         else:
             self.setStyleSheet('background-color: white')
 
-
     def __modeOne(self):
         if not self.rectAppeared:
             self.timerStarted = True
             self.update()
             self.timeWaited = random.randint(
                 1, 6)
-            self.timer.singleShot(self.timeWaited*1000, lambda: self.showRect())
+            self.timer.singleShot(self.timeWaited*1000,
+                                  lambda: self.showRect())
         else:
             # catch reation time here
             self.__addRow()
@@ -140,6 +146,7 @@ class SpaceRecorder(QtWidgets.QWidget):
         print(d)
         self.df = self.df.append(d, ignore_index=True)
 
+
 def main():
     isDarkmode = False
     if len(sys.argv) == 3:
@@ -150,10 +157,13 @@ def main():
             print("Argument has to be 'True' or 'False'")
             sys.exit()
     else:
-        print("Set second argument to 'True' to start with dark mode or 'False' to start with light mode and third argument should be the participantID")
+        print("""Set second argument to 'True' to start
+        with dark mode or 'False' to start with light mode
+        and third argument should be the participantID""")
         sys.exit()
     app = QtWidgets.QApplication(sys.argv)
-    # variable is never used, class automatically registers itself for Qt main loop:
+    # variable is never used, class automatically
+    # registers itself for Qt main loop:
     space = SpaceRecorder(isDarkmode, sys.argv[2])
     sys.exit(app.exec_())
 

@@ -9,7 +9,8 @@ import pandas as pd
 from datetime import datetime
 
 FIELDS = ["id", "condition", "mode", "run", "pressed_key",
-          "pressed_correct_key", "reaction_time_in_sec", "time_waited_in_sec", "time_stamp"]
+          "pressed_correct_key", "reaction_time_in_sec",
+          "time_waited_in_sec", "time_stamp"]
 
 
 class SpaceRecorder(QtWidgets.QWidget):
@@ -34,7 +35,6 @@ class SpaceRecorder(QtWidgets.QWidget):
         self.circleAppeared = False
         self.timeWaited = 0
         self.timeWaitedFalse = 0
-
 
     def showRect(self):
         self.update()
@@ -61,33 +61,34 @@ class SpaceRecorder(QtWidgets.QWidget):
 
     def drawText(self, event, qp):
         if self.rectAppeared:
-          self.rectAppeared = False
+            self.rectAppeared = False
         elif self.circleAppeared:
-          self.circleAppeared = False
+            self.circleAppeared = False
         qp.setPen(self.color)
         qp.setFont(QtGui.QFont('Decorative', 32))
         if self.round == 1:
-          self.text = "Press 'Space' to start. \nPress 'Space' only if a RECTANGLE appears"
+            self.text = """Press 'Space' to start. \nPress 'Space'
+                        only if a RECTANGLE appears"""
         if self.round > 1:
             self.text = f'Press "Space" to start round {str(self.round)}'
         if self.round == 21:
             self.text = "You have finished the first test. \nThank you!"
             self.df = self.df.to_csv(
-                f'/home/erik/assignments/assignment-03-bs/test2_{self.id}.csv', index=False)
+                f'/home/erik/assignments/assignment-03-bs/test2_{self.id}.csv',
+                index=False)
         qp.drawText(event.rect(), QtCore.Qt.AlignCenter, self.text)
 
     def drawRect(self, event, qp):
-      randNum = random.randint(0, 1)
-      qp.setBrush(self.color)
-      rect = self.__getRandomRect()
-      if randNum == 0:
-        qp.drawRect(rect)
-        self.rectAppeared = True
-      else:
-        qp.drawEllipse(rect)
-        self.circleAppeared = True
-        self.timer.singleShot(3000, lambda: self.__drawAgain())
-
+        randNum = random.randint(0, 1)
+        qp.setBrush(self.color)
+        rect = self.__getRandomRect()
+        if randNum == 0:
+            qp.drawRect(rect)
+            self.rectAppeared = True
+        else:
+            qp.drawEllipse(rect)
+            self.circleAppeared = True
+            self.timer.singleShot(3000, lambda: self.__drawAgain())
 
     def __getRandomRect(self):
         xPos = random.randint(0, self.width - self.maxRectWidth)
@@ -119,7 +120,8 @@ class SpaceRecorder(QtWidgets.QWidget):
             self.timerStarted = True
             self.update()
             self.timeWaited = random.randint(1, 6)
-            self.timer.singleShot(self.timeWaited*1000, lambda: self.showRect())
+            self.timer.singleShot(self.timeWaited*1000,
+                                  lambda: self.showRect())
         else:
             # catch reation time here
             self.__addRow()
@@ -170,10 +172,13 @@ def main():
             print("Argument has to be 'True' or 'False'")
             sys.exit()
     else:
-        print("Set second argument to 'True' to start with dark mode or 'False' to start with light mode and third argument should be the participantID")
+        print("""Set second argument to 'True'
+        to start with dark mode or 'False' to start
+        with light mode and third argument should be the participantID""")
         sys.exit()
     app = QtWidgets.QApplication(sys.argv)
-    # variable is never used, class automatically registers itself for Qt main loop:
+    # variable is never used, class automatically
+    # registers itself for Qt main loop:
     space = SpaceRecorder(isDarkmode, sys.argv[2])
     sys.exit(app.exec_())
 
